@@ -1,0 +1,56 @@
+#:import dp kivy.metrics.dp
+
+MDScreen:
+    md_bg_color: app.theme_cls.bg_dark
+
+    MDTopAppBar:
+        title: "Media Utility"
+        elevation: 4
+        pos_hint: {"top": 1}
+
+    MDBoxLayout:
+        orientation: "vertical"
+        padding: dp(20)
+        spacing: dp(16)
+        pos_hint: {"top": 0.9}
+
+        MDCard:
+            radius: [18, 18, 18, 18]
+            elevation: 3
+            padding: dp(16)
+            size_hint_y: None
+            height: dp(180)
+
+            MDBoxLayout:
+                orientation: "vertical"
+                spacing: dp(12)
+
+                MDTextField:
+                    id: url_input
+                    hint_text: "YouTube URL"
+                    mode: "rectangle"
+                    icon_right: "link-variant"
+                    helper_text: "Paste a YouTube link"
+                    helper_text_mode: "on_focus"
+
+                MDDropdownItem:
+                    id: mode_select
+                    text: "Audio (M4A)"
+                    pos_hint: {"center_x": 0.5}
+
+                MDRaisedButton:
+                    text: "Download"
+                    pos_hint: {"center_x": 0.5}
+                    on_release:
+                        app.start_download(url_input.text)
+
+        MDProgressBar:
+            id: progress
+            value: 0
+            max: 100
+
+        MDLabel:
+            id: status
+            text: "Idle"
+            halign: "center"
+            theme_text_color: "Hint"

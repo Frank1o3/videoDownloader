@@ -1,0 +1,79 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    runs-on: ubuntu-22.04
+
+    env:
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+      ANDROID_HOME: /usr/local/lib/android/sdk
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # -----------------------------
+    # System dependencies
+    # -----------------------------
+    - name: Install system packages
+      run: |
+        sudo apt update
+        sudo apt install -y \
+          python3 python3-pip python3-venv \
+          git zip unzip curl \
+          openjdk-17-jdk \
+          build-essential \
+          autoconf automake libtool pkg-config \
+          libssl-dev libffi-dev liblzma-dev \
+          zlib1g-dev libncurses5-dev libncursesw5-dev
+
+    # -----------------------------
+    # Python tooling
+    # -----------------------------
+    - name: Install Poetry
+      run: |
+        pip install --upgrade pip
+        pip install poetry
+
+    - name: Configure Poetry
+      run: |
+        poetry config virtualenvs.create false
+
+    - name: Install Python dependencies (desktop sanity)
+      run: |
+        poetry install --no-root
+
+    # -----------------------------
+    # Buildozer
+    # -----------------------------
+    - name: Install Buildozer
+      run: |
+        pip install buildozer cython
+
+    - name: Accept Android licenses
+      run: |
+        mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
+        yes | sdkmanager --licenses || true
+
+    # -----------------------------
+    # Build APK
+    # -----------------------------
+    - name: Build APK (debug)
+      run: |
+        buildozer android debug
+
+    # -----------------------------
+    # Upload artifact
+    # -----------------------------
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: videodownloader-apk
+        path: bin/*.apk
