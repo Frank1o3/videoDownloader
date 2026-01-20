@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-    contents: read
+    contents: write
 
 jobs:
   build-android:
@@ -47,7 +47,7 @@ jobs:
 
     - name: Install Python dependencies (desktop sanity)
       run: |
-        poetry install --no-root
+        poetry config virtualenvs.create true --local && poetry install --no-root
 
     # -----------------------------
     # Buildozer
